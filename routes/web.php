@@ -1,5 +1,10 @@
 <?php
 
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,26 +18,25 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/register',[RegisterController::class,'showRegistrationForm'])->name('register');
+Route::post('/register',[RegisterController::class,'register']);
 
-Route::get('/hello', function () {
-    return string('hello');
-});
+Route::get('/login',[LoginController::class,'showLoginForm'])->name('login');
+Route::post('/login',[LoginController::class,'login']);
 
-Route::get('/data', function () {
-    return [
-        "name"=> "cours complet laravel10",
-        "lang" => "php,js",
-        "age" => "14"
-    ];
-});
+Route::post('/logout', [LoginController::class,'logout'])->name('logout');
 
-Route::get('/{name}', function (string $name) {
-    return "Hello " . $name;
-});
+Route::get('/home', [HomeController::class, 'home'])->name('home');
+// Route::post('/home', [HomeController::class, 'store']); // Ajoute cette ligne pour accepter les POST
+Route::patch('/home', [HomeController::class, 'updatePassword']);
 
-Route::get('/posts/{id}', function (int $id) {
-    return 'posts '.$id;
-});
+Route::resource('/admin/posts', AdminController::class)->except('show')->names('admin.posts');
+
+Route::get('/', [PostController::class,'index'])->name('index');
+
+Route::get('/categories/{category}', [PostController::class,'postsByCategory'])->name('posts.byCategory');
+
+Route::get('/tags/{tag}', [PostController::class,'postsByTag'])->name('posts.byTag');
+
+Route::get('/{post}', [PostController::class,'show'])->name('posts.show');
+Route::post('/{post}/comment', [PostController::class,'comment'])->name('posts.comment');
